@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mes Commandes — TrendShop</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #6c47ff;
+      --primary-dark: #4f2fe0;
+      --accent: #ff6b35;
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --muted: #7a7a9d;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 14px;
+      --shadow: 0 4px 24px rgba(108,71,255,0.10);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(108,71,255,0.25);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      cursor: pointer;
+    }
+
+    .logo span { color: #ffd166; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .profile-menu { position: relative; }
+    .profile-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .profile-btn:hover { background: rgba(255,255,255,0.3); }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      min-width: 200px;
+      display: none;
+      z-index: 1000;
+      overflow: hidden;
+    }
+    .dropdown-menu.show { display: block; }
+
+    .dropdown-item {
+      padding: 12px 15px;
+      color: var(--text);
+      text-decoration: none;
+      display: block;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s;
+    }
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background: var(--bg); color: var(--primary); }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      padding: 0.5rem 1.2rem;
+      border: 2px solid #e0e0f0;
+      border-radius: 50px;
+      background: white;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s;
+      color: var(--muted);
+    }
+
+    .filter-tab:hover, .filter-tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .orders-container {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .order-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .order-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 36px rgba(108,71,255,0.15);
+    }
+
+    .order-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .order-number {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+
+    .order-date {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 0.3rem;
+    }
+
+    .order-status {
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-processing {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .status-shipped {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .status-delivered {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .order-body {
+      padding: 1.5rem;
+    }
+
+    .order-items {
+      margin-bottom: 1.5rem;
+    }
+
+    .order-item {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .order-item:last-child {
+      border-bottom: none;
+    }
+
+    .item-emoji {
+      font-size: 2rem;
+    }
+
+    .item-details {
+      flex: 1;
+    }
+
+    .item-name {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .item-qty {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 0.2rem;
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .order-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .summary-item {
+      padding: 0.75rem;
+      background: #f9f9f9;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .summary-value {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .order-footer {
+      padding: 1.5rem;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e0e0f0;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: white;
+      border: 2px solid #e0e0f0;
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .empty-state-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-state-desc {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-shop {
+      background: var(--primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+
+    .btn-shop:hover {
+      background: var(--primary-dark);
+    }
+
+    .tracking-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tracking-modal.show {
+      display: flex;
+    }
+
+    .tracking-content {
+      background: white;
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .tracking-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .tracking-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    .tracking-step {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .tracking-step::before {
+      content: '';
+      position: absolute;
+      left: 20px;
+      top: 40px;
+      width: 2px;
+      height: calc(100% + 20px);
+      background: #e0e0f0;
+    }
+
+    .tracking-step:last-child::before {
+      display: none;
+    }
+
+    .tracking-step.completed::before {
+      background: var(--success);
+    }
+
+    .tracking-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e0e0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tracking-step.completed .tracking-icon {
+      background: var(--success);
+      color: white;
+    }
+
+    .tracking-info h4 {
+      margin-bottom: 0.3rem;
+      color: var(--text);
+    }
+
+    .tracking-info p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(108,71,255,0.3);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .page-title {
+        font-size: 1.5rem;
+      }
+
+      .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .order-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo" onclick="window.location.href='index.html'">Trend<span>Shop</span></div>
+  <div class="header-right">
+    <div class="profile-menu">
+      <button class="profile-btn" onclick="toggleProfileMenu()">👤</button>
+      <div class="dropdown-menu" id="profileDropdown">
+        <a class="dropdown-item" href="profile.html">Mon Profil</a>
+        <a class="dropdown-item" href="my-orders.html">Mes Commandes</a>
+        <a class="dropdown-item" onclick="logout()">Déconnexion</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="page-title">Mes Commandes 📦</h1>
+
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterOrders('all', this)">Toutes</button>
+    <button class="filter-tab" onclick="filterOrders('pending', this)">En attente</button>
+    <button class="filter-tab" onclick="filterOrders('processing', this)">En traitement</button>
+    <button class="filter-tab" onclick="filterOrders('shipped', this)">Expédié</button>
+    <button class="filter-tab" onclick="filterOrders('delivered', this)">Livré</button>
+  </div>
+
+  <div id="ordersContent" class="loading">
+    <div class="spinner"></div> Chargement des commandes...
+  </div>
+</div>
+
+<!-- Tracking Modal -->
+<div class="tracking-modal" id="trackingModal">
+  <div class="tracking-content">
+    <div class="tracking-header">
+      <h2>Suivi de commande</h2>
+      <button class="tracking-close" onclick="closeTrackingModal()">✕</button>
+    </div>
+    <div id="trackingSteps"></div>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'http://localhost:5000/api';
+  let currentFilter = 'all';
+
+  const mockOrders = [
+    {
+      id: 'ORD-001',
+      date: '2026-05-28',
+      total: 124.80,
+      status: 'delivered',
+      items: [
+        { id: 1, name: 'Casque Pro ANC 2026', emoji: '🎧', qty: 1, price: 49.90 },
+        { id: 5, name: 'Chargeur MagSafe 3-en-1', emoji: '📱', qty: 1, price: 27.90 }
+      ]
+    },
+    {
+      id: 'ORD-002',
+      date: '2026-05-29',
+      total: 59.90,
+      status: 'shipped',
+      items: [
+        { id: 3, name: 'Purificateur d\'Air HEPA', emoji: '🌬️', qty: 1, price: 59.90 }
+      ]
+    },
+    {
+      id: 'ORD-003',
+      date: '2026-05-30',
+      total: 34.90,
+      status: 'processing',
+      items: [
+        { id: 2, name: 'Sérum LED Anti-Âge', emoji: '✨', qty: 1, price: 34.90 }
+      ]
+    },
+    {
+      id: 'ORD-004',
+      date: '2026-05-31',
+      total: 87.80,
+      status: 'pending',
+      items: [
+        { id: 4, name: 'Ceinture EMS Full Body', emoji: '💪', qty: 1, price: 39.90 },
+        { id: 6, name: 'Lampe Lune 3D LED', emoji: '💡', qty: 1, price: 22.90 }
+      ]
+    }
+  ];
+
+  const statusLabels = {
+    pending: { label: 'En attente', class: 'status-pending' },
+    processing: { label: 'En traitement', class: 'status-processing' },
+    shipped: { label: 'Expédié', class: 'status-shipped' },
+    delivered: { label: 'Livré', class: 'status-delivered' },
+    cancelled: { label: 'Annulé', class: 'status-cancelled' }
+  };
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function formatPrice(price) {
+    return price.toFixed(2).replace('.', ',') + ' €';
+  }
+
+  async function loadOrders() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = 'auth.html';
+      return;
+    }
+
+    try {
+      displayOrders(mockOrders);
+    } catch (error) {
+      console.error('Erreur:', error);
+      displayEmpty();
+    }
+  }
+
+  function displayOrders(orders) {
+    const container = document.getElementById('ordersContent');
+
+    if (orders.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <h2 class="empty-state-title">Aucune commande</h2>
+          <p class="empty-state-desc">Vous n'avez pas encore passé de commande.</p>
+          <a href="index.html" class="btn-shop">🛒 Commencer à acheter</a>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="orders-container">
+        ${orders.map(order => `
+          <div class="order-card">
+            <div class="order-header">
+              <div>
+                <div class="order-number">${order.id}</div>
+                <div class="order-date">Passée le ${formatDate(order.date)}</div>
+              </div>
+              <div class="order-status ${statusLabels[order.status].class}">
+                ${statusLabels[order.status].label}
+              </div>
+            </div>
+
+            <div class="order-body">
+              <div class="order-items">
+                ${order.items.map(item => `
+                  <div class="order-item">
+                    <div class="item-emoji">${item.emoji}</div>
+                    <div class="item-details">
+                      <div class="item-name">${item.name}</div>
+                      <div class="item-qty">Quantité: ${item.qty}</div>
+                    </div>
+                    <div class="item-price">${formatPrice(item.price)}</div>
+                  </div>
+                `).join('')}
+              </div>
+
+              <div class="order-summary">
+                <div class="summary-item">
+                  <div class="summary-label">Sous-total</div>
+                  <div class="summary-value">${formatPrice(order.total * 0.85)}</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-label">Livraison</div>
+                  <div class="summary-value">${formatPrice(order.total * 0.15)}</div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-label">Total</div>
+                  <div class="summary-value">${formatPrice(order.total)}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="order-footer">
+              <div style="color: var(--muted); font-size: 0.9rem;">
+                ${getEstimatedDelivery(order.date, order.status)}
+              </div>
+              <div class="order-actions">
+                <button class="btn-primary" onclick="showTracking('${order.id}', '${order.status}')">
+                  📍 Suivre
+                </button>
+                <button class="btn-secondary" onclick="downloadInvoice('${order.id}')">
+                  📄 Facture
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function displayEmpty() {
+    document.getElementById('ordersContent').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <h2 class="empty-state-title">Erreur de chargement</h2>
+        <p class="empty-state-desc">Impossible de charger vos commandes.</p>
+        <button class="btn-shop" onclick="loadOrders()">Réessayer</button>
+      </div>
+    `;
+  }
+
+  function getEstimatedDelivery(orderDate, status) {
+    const date = new Date(orderDate);
+    let daysToAdd = 0;
+
+    if (status === 'pending') daysToAdd = 3;
+    else if (status === 'processing') daysToAdd = 2;
+    else if (status === 'shipped') daysToAdd = 1;
+    else if (status === 'delivered') return '✅ Livré';
+
+    date.setDate(date.getDate() + daysToAdd);
+    const formatted = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+    return `📅 Livraison estimée: ${formatted}`;
+  }
+
+  function filterOrders(status, btn) {
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = status;
+
+    const filtered = status === 'all'
+      ? mockOrders
+      : mockOrders.filter(o => o.status === status);
+
+    displayOrders(filtered);
+  }
+
+  function showTracking(orderId, status) {
+    const steps = [
+      { status: 'pending', label: 'Commande confirmée', icon: '✓', date: 'Aujourd\'hui' },
+      { status: 'processing', label: 'Préparation en cours', icon: '📦', date: 'Dans 1 jour' },
+      { status: 'shipped', label: 'Expédié', icon: '🚚', date: 'Dans 2 jours' },
+      { status: 'delivered', label: 'Livré', icon: '✅', date: 'Dans 3 jours' }
+    ];
+
+    const statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+    const currentIndex = statusOrder.indexOf(status);
+
+    const html = steps.map((step, idx) => `
+      <div class="tracking-step ${idx <= currentIndex ? 'completed' : ''}">
+        <div class="tracking-icon">${step.icon}</div>
+        <div class="tracking-info">
+          <h4>${step.label}</h4>
+          <p>${step.date}</p>
+        </div>
+      </div>
+    `).join('');
+
+    document.getElementById('trackingSteps').innerHTML = html;
+    document.getElementById('trackingModal').classList.add('show');
+  }
+
+  function closeTrackingModal() {
+    document.getElementById('trackingModal').classList.remove('show');
+  }
+
+  function downloadInvoice(orderId) {
+    alert('📄 Téléchargement de la facture ' + orderId + '\n\nFonctionnalité à implémenter avec le backend');
+  }
+
+  function toggleProfileMenu() {
+    const dropdown = document.getElementById('profileDropdown');
+    dropdown.classList.toggle('show');
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+  }
+
+  document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('profileDropdown');
+    if (!e.target.closest('.profile-menu')) {
+      dropdown.classList.remove('show');
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'trackingModal') {
+      closeTrackingModal();
+    }
+  });
+
+  loadOrders();
+</script>
+
+</body>
+</html>
