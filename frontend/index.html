@@ -30,10 +30,46 @@
       height: 64px; position: sticky; top: 0; z-index: 100;
       box-shadow: 0 2px 16px rgba(108,71,255,0.25);
     }
+    
+    .header-left { display: flex; align-items: center; gap: 2rem; }
     .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
     .logo span { color: #ffd166; }
-    #cart-btn {
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+
+    .auth-btn {
       background: white; color: var(--primary); border: none;
+      border-radius: 50px; padding: 0.5rem 1.2rem;
+      font-weight: 700; font-size: 0.95rem; cursor: pointer;
+      transition: transform 0.15s; text-decoration: none;
+    }
+    .auth-btn:hover { transform: scale(1.05); }
+
+    .profile-menu { position: relative; }
+    .profile-btn {
+      background: rgba(255,255,255,0.2); color: white; border: none;
+      border-radius: 50%; width: 40px; height: 40px;
+      cursor: pointer; font-size: 18px; transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .profile-btn:hover { background: rgba(255,255,255,0.3); }
+
+    .dropdown-menu {
+      position: absolute; top: 50px; right: 0;
+      background: white; border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      min-width: 200px; display: none; z-index: 1000; overflow: hidden;
+    }
+    .dropdown-menu.show { display: block; }
+    .dropdown-item {
+      padding: 12px 15px; color: var(--text);
+      text-decoration: none; display: block; cursor: pointer;
+      border-bottom: 1px solid #f0f0f0; transition: all 0.2s;
+    }
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background: var(--bg); color: var(--primary); }
+
+    #cart-btn {
+      background: rgba(255,255,255,0.2); color: white; border: none;
       border-radius: 50px; padding: 0.5rem 1.2rem;
       font-weight: 700; font-size: 0.95rem; cursor: pointer;
       display: flex; align-items: center; gap: 0.5rem; transition: transform 0.15s;
@@ -208,16 +244,34 @@
     @media (max-width: 480px) {
       .products { padding: 1rem; gap: 1rem; }
       .hero { padding: 2.5rem 1rem 2rem; }
+      .header-right { gap: 0.5rem; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Trend<span>Shop</span></div>
-  <button id="cart-btn" onclick="toggleCart()">
-    🛒 Panier <div id="cart-count">0</div>
-  </button>
+  <div class="header-left">
+    <div class="logo">Trend<span>Shop</span></div>
+  </div>
+  <div class="header-right">
+    <button id="cart-btn" onclick="toggleCart()">
+      🛒 Panier <div id="cart-count">0</div>
+    </button>
+    
+    <div id="authSection" class="profile-menu">
+      <a href="auth.html" class="auth-btn">Connexion</a>
+    </div>
+
+    <div id="profileSection" class="profile-menu" style="display: none;">
+      <button class="profile-btn" onclick="toggleProfileMenu()">👤</button>
+      <div class="dropdown-menu" id="profileDropdown">
+        <a class="dropdown-item" href="profile.html">Mon Profil</a>
+        <a class="dropdown-item" href="my-orders.html">Mes Commandes</a>
+        <a class="dropdown-item" onclick="logout()">Déconnexion</a>
+      </div>
+    </div>
+  </div>
 </header>
 
 <section class="hero">
@@ -317,6 +371,31 @@
   const fmt = n => n.toFixed(2).replace('.', ',') + ' €';
   const discount = p => Math.round((1 - p.price / p.oldPrice) * 100);
   const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+
+  function checkAuth() {
+    const token = localStorage.getItem('token');
+    const authSection = document.getElementById('authSection');
+    const profileSection = document.getElementById('profileSection');
+
+    if (token) {
+      authSection.style.display = 'none';
+      profileSection.style.display = 'block';
+    } else {
+      authSection.style.display = 'block';
+      profileSection.style.display = 'none';
+    }
+  }
+
+  function toggleProfileMenu() {
+    const dropdown = document.getElementById('profileDropdown');
+    dropdown.classList.toggle('show');
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+  }
 
   function renderProducts(filter = 'all') {
     const grid = document.getElementById('products-grid');
@@ -448,28 +527,34 @@
 
   async function handleStripeCheckout() {
     const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
-    const response = await fetch(`${API_URL}/payments/stripe/create-intent`, {
+    await fetch(`${API_URL}/payments/stripe/create-intent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount: total, items: cart }),
     });
-    const data = await response.json();
     showToast('✅ Paiement Stripe initialisé');
     setTimeout(() => { window.location.href = 'success.html?order=ORD-' + Date.now(); }, 1500);
   }
 
   async function handlePayPalCheckout() {
-    const response = await fetch(`${API_URL}/payments/paypal/create`, {
+    await fetch(`${API_URL}/payments/paypal/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items: cart }),
     });
-    const data = await response.json();
     showToast('✅ Paiement PayPal initialisé');
     setTimeout(() => { window.location.href = 'success.html?order=ORD-' + Date.now(); }, 1500);
   }
 
+  document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('profileDropdown');
+    if (!e.target.closest('.profile-menu')) {
+      dropdown.classList.remove('show');
+    }
+  });
+
   renderProducts();
+  checkAuth();
 </script>
 
 </body>
