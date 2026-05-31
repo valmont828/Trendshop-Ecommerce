@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Succès - TrendShop</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #6c47ff 0%, #a78bfa 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .success-container {
+      background: white;
+      border-radius: 20px;
+      padding: 60px 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 500px;
+    }
+    .checkmark {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: bounce 0.6s;
+    }
+    @keyframes bounce {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    h1 { color: #1a1a2e; margin-bottom: 10px; font-size: 32px; }
+    p { color: #7a7a9d; margin-bottom: 30px; font-size: 16px; }
+    .order-number {
+      background: #f4f6fb;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+      font-weight: 700;
+      color: #6c47ff;
+    }
+    .button {
+      background: #6c47ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .button:hover { background: #4f2fe0; }
+    .button-secondary {
+      background: white;
+      color: #6c47ff;
+      border: 2px solid #6c47ff;
+      margin-left: 10px;
+    }
+    .button-secondary:hover { background: #f4f6fb; }
+  </style>
+</head>
+<body>
+  <div class="success-container">
+    <div class="checkmark">✅</div>
+    <h1>Commande Réussie!</h1>
+    <p>Merci de votre achat. Votre commande a été confirmée avec succès.</p>
+    <div class="order-number">
+      Numéro de commande: <br>
+      <span id="order-number">#ORD-1234567890</span>
+    </div>
+    <p style="font-size: 14px; margin: 20px 0;">Un email de confirmation a été envoyé à votre adresse email.</p>
+    <p style="font-size: 14px; color: #22c55e;">Vous recevrez des mises à jour de suivi par email.</p>
+    <button class="button" onclick="window.location.href='index.html'">Continuer les achats</button>
+    <button class="button button-secondary" onclick="window.location.href='tracking.html'">Tracker ma commande</button>
+  </div>
+
+  <script>
+    // Get order number from URL params
+    const params = new URLSearchParams(window.location.search);
+    const orderNumber = params.get('order') || '#ORD-' + Date.now();
+    document.getElementById('order-number').textContent = orderNumber;
+  </script>
+</body>
+</html>
