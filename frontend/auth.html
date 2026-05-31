@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - TrendShop</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #6c47ff 0%, #a78bfa 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 450px;
+      overflow: hidden;
+    }
+
+    .form-header {
+      background: linear-gradient(135deg, #6c47ff 0%, #4f2fe0 100%);
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .form-header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .form-header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .form-content {
+      padding: 40px 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #1a1a2e;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0f0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #6c47ff;
+      box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.1);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #6c47ff 0%, #4f2fe0 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(108, 71, 255, 0.3);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .toggle-form {
+      text-align: center;
+      margin-top: 20px;
+      color: #7a7a9d;
+      font-size: 14px;
+    }
+
+    .toggle-form a {
+      color: #6c47ff;
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .toggle-form a:hover {
+      text-decoration: underline;
+    }
+
+    .message {
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .message.error {
+      background: #fee;
+      color: #c33;
+      display: block;
+      border: 1px solid #f99;
+    }
+
+    .message.success {
+      background: #efe;
+      color: #3c3;
+      display: block;
+      border: 1px solid #9f9;
+    }
+
+    #loginForm { display: block; }
+    #signupForm { display: none; }
+
+    .password-group {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 38px;
+      cursor: pointer;
+      color: #7a7a9d;
+      font-size: 18px;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    @media (max-width: 600px) {
+      .form-content {
+        padding: 30px 20px;
+      }
+
+      .form-header {
+        padding: 30px 20px;
+      }
+
+      .form-header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- LOGIN FORM -->
+  <form id="loginForm" onsubmit="handleLogin(event)">
+    <div class="form-header">
+      <h1>Trend<span style="color: #ffd166;">Shop</span></h1>
+      <p>Connexion</p>
+    </div>
+
+    <div class="form-content">
+      <div class="message" id="loginMessage"></div>
+
+      <div class="form-group">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="votre@email.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="loginPassword">Mot de passe</label>
+        <div class="password-group">
+          <input type="password" id="loginPassword" placeholder="Minimum 6 caractères" required>
+          <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')">👁️</button>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="loginBtn">
+        Se connecter
+      </button>
+
+      <div class="toggle-form">
+        Pas encore inscrit? <a onclick="toggleForms()">S'inscrire</a>
+      </div>
+    </div>
+  </form>
+
+  <!-- SIGNUP FORM -->
+  <form id="signupForm" onsubmit="handleSignup(event)">
+    <div class="form-header">
+      <h1>Trend<span style="color: #ffd166;">Shop</span></h1>
+      <p>Inscription</p>
+    </div>
+
+    <div class="form-content">
+      <div class="message" id="signupMessage"></div>
+
+      <div class="form-group">
+        <label for="signupName">Nom complet</label>
+        <input type="text" id="signupName" placeholder="Jean Dupont" required>
+      </div>
+
+      <div class="form-group">
+        <label for="signupEmail">Email</label>
+        <input type="email" id="signupEmail" placeholder="votre@email.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="signupPassword">Mot de passe</label>
+        <div class="password-group">
+          <input type="password" id="signupPassword" placeholder="Minimum 6 caractères" required>
+          <button type="button" class="toggle-password" onclick="togglePassword('signupPassword')">👁️</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="signupPasswordConfirm">Confirmer le mot de passe</label>
+        <div class="password-group">
+          <input type="password" id="signupPasswordConfirm" placeholder="Confirmez le mot de passe" required>
+          <button type="button" class="toggle-password" onclick="togglePassword('signupPasswordConfirm')">👁️</button>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="signupBtn">
+        S'inscrire
+      </button>
+
+      <div class="toggle-form">
+        Déjà inscrit? <a onclick="toggleForms()">Se connecter</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  const API_URL = 'http://localhost:5000/api';
+
+  function toggleForms() {
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+    signupForm.style.display = signupForm.style.display === 'none' ? 'block' : 'none';
+    
+    // Réinitialiser les messages
+    document.getElementById('loginMessage').innerHTML = '';
+    document.getElementById('signupMessage').innerHTML = '';
+  }
+
+  function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    field.type = field.type === 'password' ? 'text' : 'password';
+  }
+
+  function showMessage(elementId, message, type) {
+    const messageEl = document.getElementById(elementId);
+    messageEl.textContent = message;
+    messageEl.className = `message ${type}`;
+  }
+
+  async function handleLogin(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginBtn');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Connexion...';
+
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur de connexion');
+      }
+
+      // Stocker le token
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.customer));
+
+      showMessage('loginMessage', '✅ Connexion réussie! Redirection...', 'success');
+      
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    } catch (error) {
+      showMessage('loginMessage', '❌ ' + error.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Se connecter';
+    }
+  }
+
+  async function handleSignup(event) {
+    event.preventDefault();
+
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
+    const btn = document.getElementById('signupBtn');
+
+    // Validation simple
+    if (password.length < 6) {
+      showMessage('signupMessage', '❌ Le mot de passe doit avoir au moins 6 caractères', 'error');
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      showMessage('signupMessage', '❌ Les mots de passe ne correspondent pas', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Inscription...';
+
+    try {
+      const response = await fetch(`${API_URL}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, passwordConfirm }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur d\'inscription');
+      }
+
+      // Stocker le token
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.customer));
+
+      showMessage('signupMessage', '✅ Inscription réussie! Redirection...', 'success');
+      
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    } catch (error) {
+      showMessage('signupMessage', '❌ ' + error.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'S\'inscrire';
+    }
+  }
+
+  // Rediriger si déjà connecté
+  window.addEventListener('load', () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      window.location.href = 'index.html';
+    }
+  });
+</script>
+
+</body>
+</html>
